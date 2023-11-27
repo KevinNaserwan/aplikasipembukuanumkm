@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "802355880430",
+    "project_id": "umkm-3a9bd",
+    "storage_bucket": "umkm-3a9bd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:802355880430:android:dbb14b6bb26eb021022eff",
+        "android_client_info": {
+          "package_name": "com.example.aplikasipembukuanumkm"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCjuiWLIIe87w_hPBSh5v5jwM3l3XaItNs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
