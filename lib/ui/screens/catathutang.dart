@@ -1,6 +1,7 @@
 import 'package:aplikasipembukuanumkm/database/database.dart';
 import 'package:aplikasipembukuanumkm/ui/screens/detail.dart';
 import 'package:aplikasipembukuanumkm/ui/screens/mainhutang.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -14,11 +15,7 @@ class HutangPage extends StatefulWidget {
 class _HutangPageState extends State<HutangPage> {
   void _navigateToHutangDetail(BuildContext context, String tanggal,
       String pelanggan, int hutangDibayar, String role) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => MainHutang()
-      ),
-    );
+    Navigator.of(context).pop();
   }
 
   Future<void> showSuccessDialog() async {
@@ -49,12 +46,11 @@ class _HutangPageState extends State<HutangPage> {
             TextButton(
               onPressed: () {
                 _navigateToHutangDetail(
-                  context,
-                  dateInput.text,
-                  PelanggganInput.text,
-                  int.parse(jumlahInput.text),
-                  selectedOption!
-                );
+                    context,
+                    dateInput.text,
+                    PelanggganInput.text,
+                    int.parse(jumlahInput.text),
+                    selectedOption!);
               },
               child: Text('OK'),
             ),
@@ -65,11 +61,13 @@ class _HutangPageState extends State<HutangPage> {
   }
 
   uploadData() async {
+    DateTime selectedDate = DateTime.parse(dateInput.text);
+    Timestamp timestamp = Timestamp.fromDate(selectedDate);
     Map<String, dynamic> uploadData = {
       "Pelanggan": PelanggganInput.text,
       "Jumlah": int.parse(jumlahInput.text),
       "catatan": catatanInput.text,
-      "Tanggal": dateInput.text,
+      "Tanggal": timestamp, // Store the timestamp
       "role": selectedOption
     };
 
@@ -190,7 +188,9 @@ class _HutangPageState extends State<HutangPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Jumlah'),
+                Text(selectedOption == 'Memberi'
+                    ? 'Jumlah yang diberikan'
+                    : 'Jumlah yang dibayar'),
                 SizedBox(height: 5),
                 Container(
                   decoration: BoxDecoration(

@@ -3,14 +3,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class HutangDetail extends StatefulWidget {
-  final String tanggal;
+  final String formattedDate;
   final String pelanggan;
   final int hutangDibayar;
   final String role;
 
   const HutangDetail(
       {Key? key,
-      required this.tanggal,
+      required this.formattedDate,
       required this.pelanggan,
       required this.hutangDibayar,
       required this.role})
@@ -46,7 +46,7 @@ class _HutangDetailState extends State<HutangDetail> {
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [Text('Tanggal'), Text(widget.tanggal)],
+                      children: [Text('Tanggal'), Text(widget.formattedDate)],
                     ),
                     SizedBox(height: 10),
                     Row(
@@ -63,7 +63,9 @@ class _HutangDetailState extends State<HutangDetail> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('Hutang Dibayar'),
+                        Text(widget.role == 'Memberi'
+                            ? 'Berhutang Sebanyak'
+                            : 'Hutang Dibayar'),
                         Text('Rp ${widget.hutangDibayar.toString()}')
                       ],
                     ),
@@ -73,6 +75,15 @@ class _HutangDetailState extends State<HutangDetail> {
                       height: 2,
                       decoration: BoxDecoration(color: Colors.black),
                     ),
+                    ElevatedButton(
+                        style: ButtonStyle(
+                            elevation: MaterialStatePropertyAll(0),
+                            backgroundColor:
+                                MaterialStatePropertyAll(Colors.transparent)),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: Text(''))
                   ],
                 ),
               ),
@@ -91,7 +102,6 @@ class _HutangDetailState extends State<HutangDetail> {
             try {
               // Find the document with a specific condition (you need to adjust this based on your data model)
               var querySnapshot = await collectionReference
-                  .where('Tanggal', isEqualTo: widget.tanggal)
                   .where('Pelanggan', isEqualTo: widget.pelanggan)
                   .where('Jumlah', isEqualTo: widget.hutangDibayar)
                   .where('role', isEqualTo: widget.role)

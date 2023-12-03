@@ -1,5 +1,9 @@
+import 'package:aplikasipembukuanumkm/ui/screens/Laporan_usaha/main.dart';
 import 'package:aplikasipembukuanumkm/ui/screens/Stok/mainstok.dart';
 import 'package:aplikasipembukuanumkm/ui/screens/catathutang.dart';
+import 'package:aplikasipembukuanumkm/ui/screens/catatpembukuan/listpembukuan.dart';
+import 'package:aplikasipembukuanumkm/ui/screens/catatpembukuan/main.dart';
+import 'package:aplikasipembukuanumkm/ui/screens/laporankeuangan/main.dart';
 import 'package:aplikasipembukuanumkm/ui/screens/mainhutang.dart';
 import 'package:flutter/material.dart';
 
@@ -126,7 +130,14 @@ class _HomePageState extends State<HomePage> {
                                   RoundedRectangleBorder(
                                       borderRadius:
                                           BorderRadius.circular(200)))),
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    ListPembukuan(),
+                              ),
+                            );
+                          },
                           child: Container(
                             child: Column(
                               children: [
@@ -208,7 +219,10 @@ class _HomePageState extends State<HomePage> {
                                   RoundedRectangleBorder(
                                       borderRadius:
                                           BorderRadius.circular(200)))),
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => MainLU()));
+                          },
                           child: Container(
                             child: Column(
                               children: [
@@ -247,7 +261,10 @@ class _HomePageState extends State<HomePage> {
                                   RoundedRectangleBorder(
                                       borderRadius:
                                           BorderRadius.circular(200)))),
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => LaporanKeuangan()));
+                          },
                           child: Container(
                             child: Column(
                               children: [

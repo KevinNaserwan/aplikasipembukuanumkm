@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:aplikasipembukuanumkm/database/database.dart';
 
 const List<String> list = <String>[
   'Botol',
@@ -21,8 +22,8 @@ class AddStock extends StatefulWidget {
 }
 
 class _AddStockState extends State<AddStock> {
-  void _showSuccessDialog(BuildContext context) {
-    showDialog(
+  Future<void> showSuccessDialog() async {
+    return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -41,7 +42,29 @@ class _AddStockState extends State<AddStock> {
     );
   }
 
+
+  uploadData() async {
+    Map<String, dynamic> uploadData = {
+      "nama": namabarang.text,
+      "harga_jual": int.parse(harga_jual.text),
+      "harga_modal": int.parse(harga_modal.text),
+      "stok_saatini": int.parse(stoksaatini.text),
+      "stok_minimum": int.parse(stok_minimum.text),
+      "kategori": dropdownValue
+    };
+
+    await DatabaseMethods().addbarang(uploadData);
+    showSuccessDialog();
+  }
+
   String dropdownValue = list.first;
+  TextEditingController namabarang = TextEditingController();
+  TextEditingController harga_jual = TextEditingController();
+  TextEditingController harga_modal = TextEditingController();
+  TextEditingController stok_minimum = TextEditingController();
+  TextEditingController stoksaatini = TextEditingController();
+  TextEditingController kategori = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -74,6 +97,7 @@ class _AddStockState extends State<AddStock> {
                     child: Padding(
                       padding: const EdgeInsets.only(left: 20),
                       child: TextField(
+                        controller: namabarang,
                         decoration: InputDecoration(
                           hintText: 'Nama Barang',
                           border: InputBorder.none,
@@ -94,6 +118,7 @@ class _AddStockState extends State<AddStock> {
                     child: Padding(
                       padding: const EdgeInsets.only(left: 20),
                       child: TextField(
+                        controller: harga_jual,
                         decoration: InputDecoration(
                           hintText: 'Harga Jual',
                           border: InputBorder.none,
@@ -114,6 +139,7 @@ class _AddStockState extends State<AddStock> {
                     child: Padding(
                       padding: const EdgeInsets.only(left: 20),
                       child: TextField(
+                        controller: harga_modal,
                         decoration: InputDecoration(
                           hintText: 'Harga Modal',
                           border: InputBorder.none,
@@ -156,6 +182,7 @@ class _AddStockState extends State<AddStock> {
                               child: Padding(
                                 padding: const EdgeInsets.only(left: 20),
                                 child: TextField(
+                                  controller: stoksaatini,
                                   decoration: InputDecoration(
                                       hintText: 'Stok Saat Ini',
                                       border: InputBorder.none),
@@ -172,6 +199,7 @@ class _AddStockState extends State<AddStock> {
                               child: Padding(
                                 padding: const EdgeInsets.only(left: 20),
                                 child: TextField(
+                                  controller: stok_minimum,
                                   decoration: InputDecoration(
                                       hintText: 'Stok Minimum',
                                       border: InputBorder.none),
@@ -191,7 +219,7 @@ class _AddStockState extends State<AddStock> {
                           overlayColor:
                               MaterialStatePropertyAll(Colors.amber.shade300)),
                       onPressed: () {
-                        _showSuccessDialog(context);
+                        uploadData();
                       },
                       child: SizedBox(
                           width: double.infinity,

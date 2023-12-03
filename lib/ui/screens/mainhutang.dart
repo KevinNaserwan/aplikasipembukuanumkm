@@ -2,6 +2,7 @@ import 'package:aplikasipembukuanumkm/ui/screens/catathutang.dart';
 import 'package:aplikasipembukuanumkm/ui/screens/detail.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class MainHutang extends StatefulWidget {
   const MainHutang({super.key});
@@ -11,12 +12,12 @@ class MainHutang extends StatefulWidget {
 }
 
 class _MainHutangState extends State<MainHutang> {
-  void _navigateToHutangDetail(BuildContext context, String tanggal,
+  void _navigateToHutangDetail(BuildContext context, String formattedDate,
       String pelanggan, int hutangDibayar, String role) {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => HutangDetail(
-            tanggal: tanggal,
+            formattedDate: formattedDate,
             pelanggan: pelanggan,
             hutangDibayar: hutangDibayar,
             role: role),
@@ -53,10 +54,6 @@ class _MainHutangState extends State<MainHutang> {
                                 .where('role', isEqualTo: 'Memberi')
                                 .snapshots(),
                             builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return CircularProgressIndicator();
-                              }
                               // Calculate the sum of 'jumlah' field
                               double totalJumlah = 0;
                               if (snapshot.hasData) {
@@ -68,7 +65,12 @@ class _MainHutangState extends State<MainHutang> {
                               return Column(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  Text('Uang Saya'),
+                                  Container(
+                                      width: 120,
+                                      child: Text(
+                                        'Utang sudah dibayar',
+                                        textAlign: TextAlign.center,
+                                      )),
                                   Text('Rp $totalJumlah')
                                 ],
                               );
@@ -79,11 +81,6 @@ class _MainHutangState extends State<MainHutang> {
                                 .where('role', isEqualTo: 'Menerima')
                                 .snapshots(),
                             builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return CircularProgressIndicator();
-                              }
-
                               // Calculate the sum of 'jumlah' field
                               double totalJumlah = 0;
                               if (snapshot.hasData) {
@@ -97,7 +94,12 @@ class _MainHutangState extends State<MainHutang> {
                                 return Column(
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
-                                    Text('Uang Pelanggan'),
+                                    Container(
+                                        width: 160,
+                                        child: Text(
+                                          'Total Pembayaran Utang',
+                                          textAlign: TextAlign.center,
+                                        )),
                                     Text('Rp $totalJumlah')
                                   ],
                                 );
@@ -113,10 +115,6 @@ class _MainHutangState extends State<MainHutang> {
                     .collection('catatan_hutang')
                     .snapshots(),
                 builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
-                  }
-
                   if (!snapshot.hasData ||
                       (snapshot.data! as QuerySnapshot).docs.isEmpty) {
                     return Center(
@@ -130,7 +128,14 @@ class _MainHutangState extends State<MainHutang> {
                       itemCount: documents.length,
                       itemBuilder: (context, index) {
                         var document = documents[index];
-                        var tanggal = document['Tanggal'];
+                        // Inside your build method where you get the 'Tanggal' value
+                        var tanggal = documents[index];
+                        var timestamp = (document['Tanggal'] as Timestamp)
+                            .toDate(); // Convert timestamp to DateTime
+
+// Now, you can format the DateTime object as a string
+                        var formattedDate = DateFormat('dd-MM-yyyy')
+                            .format(timestamp); // Customize the dat
                         var pelanggan = document['Pelanggan'];
                         var jumlah = document['Jumlah'];
                         var role = document['role'];
@@ -144,7 +149,7 @@ class _MainHutangState extends State<MainHutang> {
                                   elevation: MaterialStatePropertyAll(0)),
                               onPressed: () {
                                 _navigateToHutangDetail(
-                                    context, tanggal, pelanggan, jumlah, role);
+                                    context, formattedDate, pelanggan, jumlah, role);
                               },
                               child: Padding(
                                 padding: EdgeInsets.symmetric(horizontal: 0),
@@ -162,7 +167,7 @@ class _MainHutangState extends State<MainHutang> {
                                               MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text('Tanggal'),
-                                            Text(tanggal)
+                                            Text(formattedDate)
                                           ],
                                         ),
                                         SizedBox(height: 10),

@@ -1,5 +1,5 @@
 import 'package:aplikasipembukuanumkm/ui/screens/Stok/addstok.dart';
-import 'package:aplikasipembukuanumkm/ui/screens/Stok/stokmenipis.dart';
+import 'package:aplikasipembukuanumkm/ui/screens/Stok/mainstok.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -10,14 +10,14 @@ const List<String> list = <String>[
   'Bahan Pokok'
 ];
 
-class MainStok extends StatefulWidget {
-  const MainStok({super.key});
+class StokMenipis extends StatefulWidget {
+  const StokMenipis({super.key});
 
   @override
-  State<MainStok> createState() => _MainStokState();
+  State<StokMenipis> createState() => _StokMenipisState();
 }
 
-class _MainStokState extends State<MainStok> {
+class _StokMenipisState extends State<StokMenipis> {
   String dropdownValue = list.first;
   TextEditingController stockController = TextEditingController();
   @override
@@ -43,9 +43,7 @@ class _MainStokState extends State<MainStok> {
                           MaterialStatePropertyAll(Colors.transparent),
                       elevation: MaterialStatePropertyAll(0)),
                   onPressed: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => MainStok(),
-                        maintainState: false));
+                    Navigator.of(context).pop();
                   },
                   child: Column(
                     children: [
@@ -63,11 +61,7 @@ class _MainStokState extends State<MainStok> {
                       backgroundColor:
                           MaterialStatePropertyAll(Colors.transparent),
                       elevation: MaterialStatePropertyAll(0)),
-                  onPressed: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => StokMenipis(),
-                        maintainState: false));
-                  },
+                  onPressed: () {},
                   child: Column(
                     children: [
                       Padding(
@@ -124,8 +118,9 @@ class _MainStokState extends State<MainStok> {
           ),
           Expanded(
             child: StreamBuilder<Object>(
-                stream:
-                    FirebaseFirestore.instance.collection('barang').snapshots(),
+                stream: FirebaseFirestore.instance
+                    .collection('barang')
+                    .snapshots(),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData ||
                       (snapshot.data! as QuerySnapshot).docs.isEmpty) {
@@ -142,67 +137,72 @@ class _MainStokState extends State<MainStok> {
                         var nama = document['nama'];
                         var harga = document['harga_jual'];
                         var stok = document['stok_saatini'];
-                        return Column(
-                          children: [
-                            SizedBox(height: 20),
-                            Container(
-                              color: Colors.black,
-                              width: double.infinity,
-                              height: 2,
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 25, vertical: 10),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        '$nama',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 18),
-                                      ),
-                                      Text('Harga Jual'),
-                                      Text('Rp $harga/pcs')
-                                    ],
-                                  ),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      ElevatedButton(
-                                          style: ButtonStyle(
-                                              backgroundColor:
-                                                  MaterialStatePropertyAll(
-                                                      Colors.amber)),
-                                          onPressed: () {
-                                            _showStockDialog(nama, document.id);
-                                          },
-                                          child: Text(
-                                            'Atur Stok',
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w500,
-                                                color: Colors.white),
-                                          )),
-                                      Text('Stok : $stok')
-                                    ],
-                                  ),
-                                ],
+                        var stok_minimum = document['stok_minimum'];
+                        if (stok < stok_minimum) {
+                          return Column(
+                            children: [
+                              SizedBox(height: 20),
+                              Container(
+                                color: Colors.black,
+                                width: double.infinity,
+                                height: 2,
                               ),
-                            ),
-                            SizedBox(height: 5),
-                            Container(
-                              color: Colors.black,
-                              width: double.infinity,
-                              height: 2,
-                            ),
-                          ],
-                        );
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 25, vertical: 10),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '$nama',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 18),
+                                        ),
+                                        Text('Harga Jual'),
+                                        Text('Rp $harga/pcs')
+                                      ],
+                                    ),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      children: [
+                                        ElevatedButton(
+                                            style: ButtonStyle(
+                                                backgroundColor:
+                                                    MaterialStatePropertyAll(
+                                                        Colors.amber)),
+                                            onPressed: () {
+                                              _showStockDialog(
+                                                  nama, document.id);
+                                            },
+                                            child: Text(
+                                              'Atur Stok',
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: Colors.white),
+                                            )),
+                                        Text('Stok : $stok')
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(height: 5),
+                              Container(
+                                color: Colors.black,
+                                width: double.infinity,
+                                height: 2,
+                              ),
+                            ],
+                          );
+                        }
                       });
                 }),
           )
