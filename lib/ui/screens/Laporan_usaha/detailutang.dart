@@ -2,6 +2,12 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
+import 'package:open_file/open_file.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:path_provider/path_provider.dart';
+import 'dart:typed_data';
+import 'dart:io';
 
 class DetailUtang extends StatefulWidget {
   const DetailUtang({super.key});
@@ -11,6 +17,7 @@ class DetailUtang extends StatefulWidget {
 }
 
 class _DetailUtangState extends State<DetailUtang> {
+  QuerySnapshot? savedSnapshot;
   DateTime selectedStartDate = DateTime.now();
   DateTime selectedEndDate = DateTime.now();
 
@@ -18,6 +25,9 @@ class _DetailUtangState extends State<DetailUtang> {
   String selectedEndDateString = 'Pilih Tanggal';
 
   String selectedMonthString = 'Bulan';
+
+  double totalJumlah = 0;
+  double totalJumlah1 = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +56,7 @@ class _DetailUtangState extends State<DetailUtang> {
                         .snapshots(),
                     builder: (context, snapshot) {
                       // Calculate the sum of 'jumlah' field
-                      double totalJumlah = 0;
+                      totalJumlah = 0;
                       if (snapshot.hasData) {
                         final documents = snapshot.data!.docs;
                         for (var document in documents) {
@@ -73,7 +83,7 @@ class _DetailUtangState extends State<DetailUtang> {
                                         .snapshots(),
                                     builder: (context, snapshot) {
                                       // Calculate the sum of 'jumlah' field
-                                      double totalJumlah1 = 0;
+                                      totalJumlah1 = 0;
                                       if (snapshot.hasData) {
                                         final documents = snapshot.data!.docs;
                                         for (var document in documents) {
@@ -208,7 +218,9 @@ class _DetailUtangState extends State<DetailUtang> {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(child: CircularProgressIndicator());
                 }
-
+                List<DocumentSnapshot> documents = snapshot.data?.docs ?? [];
+                // Store snapshot for later use
+                savedSnapshot = snapshot.data;
                 var data = snapshot.data!.docs;
 
                 return Padding(
@@ -227,11 +239,11 @@ class _DetailUtangState extends State<DetailUtang> {
                         return DataRow(cells: [
                           DataCell(Text(item['Pelanggan'] ??
                               'Unknown')), // Replace 'Pelanggan' with your actual field
-                          DataCell(Text((item['role'] == 'Memberi'
+                          DataCell(Text((item['role'] == 'Menerima'
                                   ? item['Jumlah']
                                   : 0)
                               .toString())), // Replace 'Jumlah' with your actual field
-                          DataCell(Text((item['role'] == 'Menerima'
+                          DataCell(Text((item['role'] == 'Memberi'
                                   ? item['Jumlah']
                                   : 0)
                               .toString())), // Replace 'Jumlah' with your actual field
@@ -249,6 +261,7 @@ class _DetailUtangState extends State<DetailUtang> {
         onPressed: () {
           // Add the functionality to download the report
           // You can implement the logic to generate and download the report here
+          _generatePDF();
         },
         label: Text(
           'Unduh Laporan',
@@ -293,5 +306,109 @@ class _DetailUtangState extends State<DetailUtang> {
         });
       }
     }
+  }
+
+  Future<void> _generatePDF() async {
+    final pdf = pw.Document();
+
+    // Tambahkan halaman PDF
+    pdf.addPage(
+      pw.Page(
+        build: (context) {
+          return pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              // Tambahkan teks Laporan Pemasukan/Pengeluaran
+              pw.Text(
+                'Laporan Pemasukan/Pengeluaran',
+                style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+              ),
+              pw.SizedBox(height: 10),
+
+              // Tambahkan teks Tanggal
+              pw.Text(
+                'Tanggal: $selectedStartDateString - $selectedEndDateString',
+              ),
+              pw.SizedBox(height: 10),
+
+              // Tambahkan teks Jumlah transaksi
+              pw.Text(
+                'Jumlah Transaksi: ${savedSnapshot?.docs.length ?? 0}',
+              ),
+              pw.SizedBox(height: 10),
+
+              // Tambahkan teks Total Pemasukan
+              pw.Text(
+                'Total Uang Diterima: Rp $totalJumlah',
+              ),
+              pw.SizedBox(height: 10),
+
+              // Tambahkan teks Total Pengeluaran
+              pw.Text(
+                'Total Uang Diberikan: Rp $totalJumlah1',
+              ),
+              pw.SizedBox(height: 10),
+
+              // Tambahkan teks Untung
+              pw.Text(
+                'Sisa Utang: Rp  ${((totalJumlah - totalJumlah1).abs())}',
+              ),
+              pw.SizedBox(height: 20),
+
+              // Tambahkan tabel dengan 5 kolom
+              pw.Table(
+                border: pw.TableBorder.all(),
+                columnWidths: {
+                  0: pw.IntrinsicColumnWidth(),
+                  1: pw.IntrinsicColumnWidth(),
+                  2: pw.IntrinsicColumnWidth(),
+                  3: pw.IntrinsicColumnWidth(),
+                },
+                children: [
+                  // Tambahkan header tabel
+                  pw.TableRow(
+                    children: [
+                      pw.Text(' No',
+                          style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                      pw.Text(' Nama',
+                          style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                      pw.Text(' Rincian',
+                          style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                      pw.Text(' Terima',
+                          style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                      pw.Text(' Berikan',
+                          style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                    ],
+                  ),
+                  for (int i = 0; i < savedSnapshot!.docs.length; i++)
+                    pw.TableRow(
+                      children: [
+                        pw.Text((i + 1).toString()),
+                        pw.Text(savedSnapshot!.docs[i]['Pelanggan'] ??
+                            ''), // Kategori // No
+                        pw.Text(
+                            savedSnapshot!.docs[i]['role'] ?? ''), // Kategori
+                        if (savedSnapshot!.docs[i]['role'] == 'Memberi')
+                          pw.Text('Rp ${0}'), // Pemasukan
+                        pw.Text(
+                            'Rp ${savedSnapshot!.docs[i]['Jumlah'] ?? 0}'), // Pemasukan
+                      ],
+                    ),
+                ],
+              ),
+            ],
+          );
+        },
+      ),
+    );
+
+    // Simpan PDF ke penyimpanan lokal
+    final directory = await getExternalStorageDirectory();
+    final String path = '${directory!.path}/laporan_keuangan.pdf';
+    final File file = File(path);
+    await file.writeAsBytes(await pdf.save());
+
+    // Buka PDF menggunakan aplikasi eksternal
+    OpenFile.open(file.path);
   }
 }

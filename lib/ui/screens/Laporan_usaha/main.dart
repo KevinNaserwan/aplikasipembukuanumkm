@@ -69,27 +69,31 @@ class _MainLUState extends State<MainLU> {
           ],
         ),
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 15),
-            child: Column(
-              children: [
-                BoxWithExpansionTile(
-                  title: 'Transaksi Pembukuan',
-                  content: 'Informasi tentang Transaksi Pembukuan',
-                  selectedDate: selectedDate,
+      body: SingleChildScrollView(
+        child: Container(
+          child: Column(
+            children: [
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 15),
+                child: Column(
+                  children: [
+                    BoxWithExpansionTile(
+                      title: 'Transaksi Pembukuan',
+                      content: 'Informasi tentang Transaksi Pembukuan',
+                      selectedDate: selectedDate,
+                    ),
+                    BoxWithExpansionTileStok(
+                      title: 'Pengelolaan Stok',
+                      content: 'Informasi tentang Pengelolaan Stok',
+                    ),
+                    BoxWithExpansionTileUtang(selectedDate: selectedDate),
+                    // ... (other BoxWithExpansionTile instances)
+                  ],
                 ),
-                BoxWithExpansionTileStok(
-                  title: 'Pengelolaan Stok',
-                  content: 'Informasi tentang Pengelolaan Stok',
-                ),
-                BoxWithExpansionTileUtang(selectedDate: selectedDate),
-                // ... (other BoxWithExpansionTile instances)
-              ],
-            ),
-          )
-        ],
+              )
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -369,7 +373,7 @@ class _BoxWithExpansionTileUtangState extends State<BoxWithExpansionTileUtang> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Utang Saya'),
+                        Text('Utang Sudah Dibayar'),
                         Divider(), // Divider line
                         Text('Rp $totalJumlah'), // Replace with actual amount
                       ],
@@ -406,7 +410,7 @@ class _BoxWithExpansionTileUtangState extends State<BoxWithExpansionTileUtang> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Utang Pelanggan'),
+                              Text('Total Pembayaran Utang'),
                               Divider(), // Divider line
                               Text(
                                   'Rp $totalJumlah'), // Replace with actual amount

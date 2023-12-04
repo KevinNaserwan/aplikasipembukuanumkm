@@ -118,93 +118,93 @@ class _StokMenipisState extends State<StokMenipis> {
           ),
           Expanded(
             child: StreamBuilder<Object>(
-                stream: FirebaseFirestore.instance
-                    .collection('barang')
-                    .snapshots(),
-                builder: (context, snapshot) {
-                  if (!snapshot.hasData ||
-                      (snapshot.data! as QuerySnapshot).docs.isEmpty) {
-                    return Center(
-                      child: Text('No data available'),
-                    );
-                  }
+              stream:
+                  FirebaseFirestore.instance.collection('barang').snapshots(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData ||
+                    (snapshot.data! as QuerySnapshot).docs.isEmpty) {
+                  return Center(
+                    child: Text('No data available'),
+                  );
+                }
 
-                  final documents = (snapshot.data! as QuerySnapshot).docs;
-                  return ListView.builder(
-                      itemCount: documents.length,
-                      itemBuilder: (context, index) {
-                        var document = documents[index];
-                        var nama = document['nama'];
-                        var harga = document['harga_jual'];
-                        var stok = document['stok_saatini'];
-                        var stok_minimum = document['stok_minimum'];
-                        if (stok < stok_minimum) {
-                          return Column(
-                            children: [
-                              SizedBox(height: 20),
-                              Container(
-                                color: Colors.black,
-                                width: double.infinity,
-                                height: 2,
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 25, vertical: 10),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                final documents = (snapshot.data! as QuerySnapshot).docs;
+                return ListView.builder(
+                  itemCount: documents.length,
+                  itemBuilder: (context, index) {
+                    var document = documents[index];
+                    var nama = document['nama'];
+                    var harga = document['harga_jual'];
+                    var stok = document['stok_saatini'];
+                    var stok_minimum = document['stok_minimum'];
+                    return Column(
+                      children: [
+                        if (stok < stok_minimum) ...[
+                          SizedBox(height: 20),
+                          Container(
+                            color: Colors.black,
+                            width: double.infinity,
+                            height: 2,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 25, vertical: 10),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          '$nama',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.w500,
-                                              fontSize: 18),
-                                        ),
-                                        Text('Harga Jual'),
-                                        Text('Rp $harga/pcs')
-                                      ],
+                                    Text(
+                                      '$nama',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 18),
                                     ),
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      children: [
-                                        ElevatedButton(
-                                            style: ButtonStyle(
-                                                backgroundColor:
-                                                    MaterialStatePropertyAll(
-                                                        Colors.amber)),
-                                            onPressed: () {
-                                              _showStockDialog(
-                                                  nama, document.id);
-                                            },
-                                            child: Text(
-                                              'Atur Stok',
-                                              style: TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: Colors.white),
-                                            )),
-                                        Text('Stok : $stok')
-                                      ],
-                                    ),
+                                    Text('Harga Jual'),
+                                    Text('Rp $harga/pcs')
                                   ],
                                 ),
-                              ),
-                              SizedBox(height: 5),
-                              Container(
-                                color: Colors.black,
-                                width: double.infinity,
-                                height: 2,
-                              ),
-                            ],
-                          );
-                        }
-                      });
-                }),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    ElevatedButton(
+                                      style: ButtonStyle(
+                                        backgroundColor:
+                                            MaterialStatePropertyAll(
+                                                Colors.amber),
+                                      ),
+                                      onPressed: () {
+                                        _showStockDialog(nama, document.id);
+                                      },
+                                      child: Text(
+                                        'Atur Stok',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                    Text('Stok : $stok')
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(height: 5),
+                          Container(
+                            color: Colors.black,
+                            width: double.infinity,
+                            height: 2,
+                          ),
+                        ],
+                      ],
+                    );
+                  },
+                );
+              },
+            ),
           )
         ],
       ),
